@@ -83,43 +83,68 @@ jobs:
         cd openwrt
         $GITHUB_WORKSPACE/24.10_diy-part2.sh
 
-    # defconfig + 禁用冲突包
-    - name: Configure and download
-      run: |
-        cd openwrt
-        make defconfig
-        # 禁用冲突包
-        sed -i 's/CONFIG_PACKAGE_dnsmasq=[ym]/# CONFIG_PACKAGE_dnsmasq is not set/' .config
-        sed -i 's/CONFIG_PACKAGE_kmod-fullconenat=[ym]/# CONFIG_PACKAGE_kmod-fullconenat is not set/' .config
-        sed -i 's/CONFIG_PACKAGE_iptables-mod-fullconenat=[ym]/# CONFIG_PACKAGE_iptables-mod-fullconenat is not set/' .config
-        sed -i 's/CONFIG_PACKAGE_luci-app-fullconenat=[ym]/# CONFIG_PACKAGE_luci-app-fullconenat is not set/' .config
-        sed -i 's/CONFIG_PACKAGE_kmod-ipt-nat6=[ym]/# CONFIG_PACKAGE_kmod-ipt-nat6 is not set/' .config
-        sed -i 's/CONFIG_PACKAGE_v2ray-plugin=[ym]/# CONFIG_PACKAGE_v2ray-plugin is not set/' .config
-        sed -i 's/CONFIG_PACKAGE_luci-app-passwall2_INCLUDE_V2ray_Plugin=[ym]/# CONFIG_PACKAGE_luci-app-passwall2_INCLUDE_V2ray_Plugin is not set/' .config
-        sed -i 's/CONFIG_PACKAGE_geoview=[ym]/# CONFIG_PACKAGE_geoview is not set/' .config
-        make defconfig
-        sed -i 's/CONFIG_PACKAGE_geoview=[ym]/# CONFIG_PACKAGE_geoview is not set/' .config
+# defconfig + 禁用冲突包
+- name: Configure and download
+  run: |
+    cd openwrt
+    make defconfig
+    # 禁用冲突包
+    sed -i 's/CONFIG_PACKAGE_dnsmasq=[ym]/# CONFIG_PACKAGE_dnsmasq is not set/' .config
+    sed -i 's/CONFIG_PACKAGE_kmod-fullconenat=[ym]/# CONFIG_PACKAGE_kmod-fullconenat is not set/' .config
+    sed -i 's/CONFIG_PACKAGE_iptables-mod-fullconenat=[ym]/# CONFIG_PACKAGE_iptables-mod-fullconenat is not set/' .config
+    sed -i 's/CONFIG_PACKAGE_luci-app-fullconenat=[ym]/# CONFIG_PACKAGE_luci-app-fullconenat is not set/' .config
+    sed -i 's/CONFIG_PACKAGE_kmod-ipt-nat6=[ym]/# CONFIG_PACKAGE_kmod-ipt-nat6 is not set/' .config
+    sed -i 's/CONFIG_PACKAGE_v2ray-plugin=[ym]/# CONFIG_PACKAGE_v2ray-plugin is not set/' .config
+    sed -i 's/CONFIG_PACKAGE_luci-app-passwall2_INCLUDE_V2ray_Plugin=[ym]/# CONFIG_PACKAGE_luci-app-passwall2_INCLUDE_V2ray_Plugin is not set/' .config
+    sed -i 's/CONFIG_PACKAGE_geoview=[ym]/# CONFIG_PACKAGE_geoview is not set/' .config
+    make defconfig
+    sed -i 's/CONFIG_PACKAGE_geoview=[ym]/# CONFIG_PACKAGE_geoview is not set/' .config
 
-        # 下载源码（带重试）
-        echo "=========================================="
-        echo " 开始下载源码包..."
-        echo "=========================================="
-        for i in 1 2 3; do
-          if make download -j8; then
-            echo " ✅ 源码下载完成"
-            break
-          fi
-          echo " ⚠️ 下载失败，重试第 $i 次..."
-          sleep 30
-        done
-        find dl -size -1024c -exec rm -f {} \;
+    # 下载源码（带重试）
+    echo "=========================================="
+    echo " 开始下载源码包..."
+    echo "=========================================="
+    for i in 1 2 3; do
+      if make download -j8; then
+        echo " ✅ 源码下载完成"
+        break
+      fi
+      echo " ⚠️ 下载失败，重试第 $i 次..."
+      sleep 30
+    done
+    find dl -size -1024c -exec rm -f {} \;
 
-        echo ""
-        echo "=========================================="
-        echo " dl 目录统计"
-        echo "=========================================="
-        echo "文件数量: $(ls dl/ | wc -l)"
-        echo "总大小: $(du -sh dl/ | cut -f1)"
+    echo ""
+    echo "=========================================="
+    echo " dl 目录统计"
+    echo "=========================================="
+    echo "文件数量: $(ls dl/ | wc -l)"
+    echo "总大小: $(du -sh dl/ | cut -f1)"
+
+# (新增) 预下载Go模块和其他编译时才会下载的依赖
+- name: Pre-download Go modules and other hidden dependencies
+  run: |
+    cd openwrt
+    echo "=========================================="
+    echo " 开始预下载所有 Go 模块和其他依赖..."
+    echo "=========================================="
+    
+    # 1. 设置 Go 代理，确保下载速度和成功率
+    export GO111MODULE=on
+    export GOPROXY=https://goproxy.cn,direct
+
+    # 2. 执行预编译。这个命令会触达所有包的 ${Build/Compile} 步骤。
+    # 它会下载所有包源码和 Go 模块，但会因缺少最终链接的库而“失败”。
+    # 我们利用这个特性来强制下载，并忽略这个“失败”。
+    echo "正在触发完整的依赖下载流程，请耐心等待..."
+    make -j$(nproc) V=s 2>&1 | tee prebuild.log || true
+    echo "预下载流程执行完毕。"
+    
+    # 3. 再次清理不完整文件
+    find dl -size -1024c -exec rm -f {} \;
+    
+    echo "依赖预下载步骤完成。"
+    echo "dl 目录最终大小: $(du -sh dl/ | cut -f1)"
 
     # 打包 dl 目录上传
     - name: Upload dl cache
