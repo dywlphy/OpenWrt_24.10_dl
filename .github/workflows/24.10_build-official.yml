@@ -68,7 +68,6 @@ jobs:
     - name: Config tune & full dependency download(j4 fixed)
       run: |
         cd openwrt
-        # 海外优先Go代理，适配GitHub云编译
         export GO111MODULE=on
         export GOPROXY=https://proxy.golang.org,https://goproxy.cn,direct
 
@@ -115,6 +114,5 @@ jobs:
     - name: Download finish tip
       run: |
         echo "====================================="
-        echo "✅ 云侧全量依赖下载完毕"
-        echo "下载包可直接替换本地 /root/openwrt-dl-cache"
+        echo "✅ 下载完成，dl包可直接用于本地编译"
         echo "====================================="
