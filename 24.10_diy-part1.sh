@@ -25,12 +25,6 @@ src-git lucipasswall https://github.com/xiaorouji/openwrt-passwall.git # Passwal
 # ================================
 src-git filemanager https://github.com/ysc3839/luci-app-filemanager.git # 文件管理
 src-git ttyd https://github.com/tsl0922/ttyd.git               # 网页终端
-src-git nlbwmon https://github.com/openwrt/packages.git;openwrt-24.10 # 流量统计
-src-git adblock https://github.com/openwrt/packages.git;openwrt-24.10 # 广告过滤
-src-git sqm https://github.com/openwrt/packages.git;openwrt-24.10      # 网速QoS
-src-git wol https://github.com/openwrt/packages.git;openwrt-24.10       # 网络唤醒
-src-git ddns https://github.com/openwrt/packages.git;openwrt-24.10      # 动态域名
-src-git upnp https://github.com/openwrt/packages.git;openwrt-24.10      # 端口映射
 EOF
 cat feeds.conf
 
