@@ -31,7 +31,7 @@ src-git sqm https://github.com/openwrt/packages.git;openwrt-24.10      # 网速Q
 src-git wol https://github.com/openwrt/packages.git;openwrt-24.10       # 网络唤醒
 src-git ddns https://github.com/openwrt/packages.git;openwrt-24.10      # 动态域名
 src-git upnp https://github.com/openwrt/packages.git;openwrt-24.10      # 端口映射
-src-git https-dns-proxy https://github.com/openwrt/packages.git;openwrt-24.10 # DoH/DoT 加密DNS
+src-git httpsdnsproxy https://github.com/openwrt/packages.git;openwrt-24.10 # DoH/DoT 加密DNS
 EOF
 cat feeds.conf
 
