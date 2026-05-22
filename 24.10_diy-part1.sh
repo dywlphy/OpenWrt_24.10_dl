@@ -16,10 +16,9 @@ cat > feeds.conf << 'EOF'
 src-git packages https://github.com/openwrt/packages.git;openwrt-24.10
 src-git luci https://github.com/openwrt/luci.git;openwrt-24.10
 src-git printing https://github.com/dywlphy/openwrt-feed-printing.git;main
-src-git timecontrol https://github.com/sirpdboy/luci-app-timecontrol
-src-git frp https://github.com/kuoruan/openwrt-frp.git
-src-git luciappfrpc https://github.com/kuoruan/luci-app-frpc.git
-src-git tailscale https://github.com/tokisaki-galaxy/luci-app-tailscale-community.git
+src-git timecontrol https://github.com/sirpdboy/luci-app-timecontrol.git
+src-git frp https://github.com/kuoruan/luci-app-frpc.git
+src-git tailscale https://github.com/Tokisaki-Galaxy/luci-app-tailscale-community.git
 src-git passwall_packages https://github.com/dywlphy/openwrt-passwall-packages.git;main
 src-git passwall2 https://github.com/dywlphy/openwrt-passwall2.git;main
 EOF
