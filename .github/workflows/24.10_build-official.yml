@@ -20,62 +20,43 @@ jobs:
     - name: Checkout
       uses: actions/checkout@main
 
-    # 安装基础依赖
     - name: Initialization environment
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
         sudo apt-get update
-        sudo apt-get install -y \
-          build-essential g++ gawk gcc-multilib gettext \
-          git libncurses-dev libssl-dev python3 python3-setuptools \
-          rsync swig unzip zlib1g-dev file wget xsltproc \
-          libelf-dev libjson-c-dev \
-          liblzo2-dev liblzma-dev libzstd-dev quilt u-boot-tools \
-          python3-dev python3-pyelftools python3-yaml \
-          curl aria2 subversion \
-          libdbus-1-dev libexpat1-dev libglib2.0-dev
+        sudo apt-get install -y build-essential g++ gawk gcc-multilib gettext git libncurses-dev libssl-dev python3 python3-setuptools rsync swig unzip zlib1g-dev file wget xsltproc libelf-dev libjson-c-dev liblzo2-dev liblzma-dev libzstd-dev quilt u-boot-tools python3-dev python3-pyelftools python3-yaml curl aria2 subversion libdbus-1-dev libexpat1-dev libglib2.0-dev
         sudo apt-get clean
         sudo timedatectl set-timezone "$TZ"
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
 
-    # 克隆 OpenWrt 源码
     - name: Clone source code
       working-directory: /workdir
       run: |
         git clone -b ${{ env.REPO_BRANCH }} --single-branch --depth 1 ${{ env.REPO_URL }} openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
-    # 缓存 dl 目录
     - name: Cache dl directory
       uses: actions/cache@v4
       with:
         path: /workdir/openwrt/dl
         key: openwrt-dl-24.10-${{ hashFiles('24.10_diy-part1.sh') }}
         restore-keys: |
-          openwrt-dl-24.10-${{ hashFiles('24.10_diy-part1.sh') }}-
           openwrt-dl-24.10-
 
-    # 配置 feeds 源
     - name: Load custom feeds
       run: |
         chmod +x 24.10_diy-part1.sh
         cd openwrt
         $GITHUB_WORKSPACE/24.10_diy-part1.sh
 
-    # 更新 feeds
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
 
-    # 安装 feeds
     - name: Install feeds
-      run: |
-        cd openwrt
-        ./scripts/feeds install -a
-        ./scripts/feeds uninstall -p passwall_packages geoview 2>/dev/null || true
+      run: cd openwrt && ./scripts/feeds install -a
 
-    # 加载配置
     - name: Load configuration
       run: |
         [ -e 24.10_config.txt ] && cp 24.10_config.txt openwrt/.config
@@ -83,12 +64,21 @@ jobs:
         cd openwrt
         $GITHUB_WORKSPACE/24.10_diy-part2.sh
 
-    # defconfig + 禁用冲突包
+    # ==============================
+    # 👇 下面这段是修复重点
+    # ==============================
     - name: Configure and download
       run: |
         cd openwrt
+        
+        # 修复 1：设置国内 GOPROXY（必须！）
+        export GO111MODULE=on
+        export GOPROXY=https://goproxy.cn,direct
+        
         make defconfig
+        
         # 禁用冲突包
+        sed -i 's/CONFIG_PACKAGE_geoview=[ym]/# CONFIG_PACKAGE_geoview is not set/' .config
         sed -i 's/CONFIG_PACKAGE_dnsmasq=[ym]/# CONFIG_PACKAGE_dnsmasq is not set/' .config
         sed -i 's/CONFIG_PACKAGE_kmod-fullconenat=[ym]/# CONFIG_PACKAGE_kmod-fullconenat is not set/' .config
         sed -i 's/CONFIG_PACKAGE_iptables-mod-fullconenat=[ym]/# CONFIG_PACKAGE_iptables-mod-fullconenat is not set/' .config
@@ -96,80 +86,33 @@ jobs:
         sed -i 's/CONFIG_PACKAGE_kmod-ipt-nat6=[ym]/# CONFIG_PACKAGE_kmod-ipt-nat6 is not set/' .config
         sed -i 's/CONFIG_PACKAGE_v2ray-plugin=[ym]/# CONFIG_PACKAGE_v2ray-plugin is not set/' .config
         sed -i 's/CONFIG_PACKAGE_luci-app-passwall2_INCLUDE_V2ray_Plugin=[ym]/# CONFIG_PACKAGE_luci-app-passwall2_INCLUDE_V2ray_Plugin is not set/' .config
-        sed -i 's/CONFIG_PACKAGE_geoview=[ym]/# CONFIG_PACKAGE_geoview is not set/' .config
+        
         make defconfig
-        sed -i 's/CONFIG_PACKAGE_geoview=[ym]/# CONFIG_PACKAGE_geoview is not set/' .config
-    
-        # 下载源码（带重试）
-        echo "=========================================="
-        echo " 开始下载源码包..."
-        echo "=========================================="
+        
+        # 修复 2：卸载 geoview 必须放在 defconfig 之后
+        ./scripts/feeds uninstall -p passwall_packages geoview 2>/dev/null || true
+        
+        # 修复 3：下载用 -j4，稳定不炸
         for i in 1 2 3; do
-          if make download -j8; then
-            echo " ✅ 源码下载完成"
+          if make download -j4; then
+            echo "✅ 下载成功"
             break
           fi
-          echo " ⚠️ 下载失败，重试第 $i 次..."
+          echo "⚠️ 下载失败，重试..."
           sleep 30
         done
-        find dl -size -1024c -exec rm -f {} \;
-    
-        echo ""
-        echo "=========================================="
-        echo " dl 目录统计"
-        echo "=========================================="
-        echo "文件数量: $(ls dl/ | wc -l)"
-        echo "总大小: $(du -sh dl/ | cut -f1)"
-
-    # (新增) 预编译Go工具链和Go包，下载所有Go模块缓存
-    - name: Pre-build Go toolchain and Go packages
-      run: |
-        cd openwrt
-        echo "=========================================="
-        echo " 预编译 Go 工具链和 Go 包，下载模块缓存..."
-        echo "=========================================="
-
-        # 1. 编译 Go 工具链（host + target）
-        echo ">>> [1/6] 编译 Go 工具链..."
-        make package/golang/host/compile V=s || true
-        make package/golang/compile V=s || true
-
-        # 2. 逐个编译 Go 包，触发模块下载
-        echo ">>> [2/6] 编译 xray-core..."
-        make package/feeds/packages/xray-core/compile V=s || true
-
-        echo ">>> [3/6] 编译 sing-box..."
-        make package/feeds/packages/sing-box/compile V=s || true
-
-        echo ">>> [4/6] 编译 frp..."
-        make package/feeds/packages/frp/compile V=s || true
-
-        echo ">>> [5/6] 编译 tailscale..."
-        make package/feeds/packages/tailscale/compile V=s || true
-
-        # 3. 清理不完整文件
-        echo ">>> [6/6] 清理不完整文件..."
-        find dl -size -1024c -exec rm -f {} \;
-
-        echo "=========================================="
-        echo " Go 模块预下载完成"
-        echo " dl 目录大小: $(du -sh dl/ | cut -f1)"
-        echo "=========================================="
-    
-        # 2. 执行预编译。这个命令会触达所有包的 ${Build/Compile} 步骤。
-        # 它会下载所有包源码和 Go 模块，但会因缺少最终链接的库而“失败”。
-        # 我们利用这个特性来强制下载，并忽略这个“失败”。
-        echo "正在触发完整的依赖下载流程，请耐心等待..."
-        make -j$(nproc) V=s 2>&1 | tee prebuild.log || true
-        echo "预下载流程执行完毕。"
         
-        # 3. 再次清理不完整文件
-        find dl -size -1024c -exec rm -f {} \;
+        # 修复 4：永不报错的清理命令
+        find dl -type f -size -1024c -delete
         
-        echo "依赖预下载步骤完成。"
-        echo "dl 目录最终大小: $(du -sh dl/ | cut -f1)"
+        echo "文件数量: $(ls dl | wc -l)"
+        echo "总大小: $(du -sh dl | cut -f1)"
 
-    # 打包 dl 目录上传
+    # ==============================
+    # 👇 修复 5：删除错误的预编译命令
+    # 只保留 下载dl，不编译
+    # ==============================
+
     - name: Upload dl cache
       uses: actions/upload-artifact@v4
       with:
@@ -177,13 +120,8 @@ jobs:
         path: openwrt/dl
         retention-days: 7
 
-    # 完成
     - name: Done
       run: |
         echo "=========================================="
-        echo " ✅ 全部完成"
+        echo " ✅ 下载完成！"
         echo "=========================================="
-        echo ""
-        echo "下载 artifact: openwrt-dl-cache-24.10"
-        echo "解压到本地 /root/openwrt-dl-cache/ 目录"
-        echo "然后执行 build-openwrt.sh 编译"
