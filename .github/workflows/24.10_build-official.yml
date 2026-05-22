@@ -121,17 +121,40 @@ jobs:
         echo "文件数量: $(ls dl/ | wc -l)"
         echo "总大小: $(du -sh dl/ | cut -f1)"
 
-    # (新增) 预下载Go模块和其他编译时才会下载的依赖
-    - name: Pre-download Go modules and other hidden dependencies
+    # (新增) 预编译Go工具链和Go包，下载所有Go模块缓存
+    - name: Pre-build Go toolchain and Go packages
       run: |
         cd openwrt
         echo "=========================================="
-        echo " 开始预下载所有 Go 模块和其他依赖..."
+        echo " 预编译 Go 工具链和 Go 包，下载模块缓存..."
         echo "=========================================="
-        
-        # 1. 设置 Go 代理，确保下载速度和成功率
-        export GO111MODULE=on
-        export GOPROXY=https://goproxy.cn,direct
+
+        # 1. 编译 Go 工具链（host + target）
+        echo ">>> [1/6] 编译 Go 工具链..."
+        make package/golang/host/compile V=s || true
+        make package/golang/compile V=s || true
+
+        # 2. 逐个编译 Go 包，触发模块下载
+        echo ">>> [2/6] 编译 xray-core..."
+        make package/feeds/packages/xray-core/compile V=s || true
+
+        echo ">>> [3/6] 编译 sing-box..."
+        make package/feeds/packages/sing-box/compile V=s || true
+
+        echo ">>> [4/6] 编译 frp..."
+        make package/feeds/packages/frp/compile V=s || true
+
+        echo ">>> [5/6] 编译 tailscale..."
+        make package/feeds/packages/tailscale/compile V=s || true
+
+        # 3. 清理不完整文件
+        echo ">>> [6/6] 清理不完整文件..."
+        find dl -size -1024c -exec rm -f {} \;
+
+        echo "=========================================="
+        echo " Go 模块预下载完成"
+        echo " dl 目录大小: $(du -sh dl/ | cut -f1)"
+        echo "=========================================="
     
         # 2. 执行预编译。这个命令会触达所有包的 ${Build/Compile} 步骤。
         # 它会下载所有包源码和 Go 模块，但会因缺少最终链接的库而“失败”。
