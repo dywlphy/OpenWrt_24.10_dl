@@ -95,13 +95,21 @@ jobs:
 
         make prereq
 
-        make download -j4 V=s
-        make target/download -j4
-        make package/download -j4
+        # 动态设置并行度
+        if [ "$(nproc)" -gt 4 ]; then
+          BUILD_J=4
+        else
+          BUILD_J=$(nproc)
+        fi
+        echo "使用并行度: -j$BUILD_J"
+
+        make download -j$BUILD_J V=s
+        make target/download -j$BUILD_J
+        make package/download -j$BUILD_J
 
         for retry in 1 2 3; do
           echo "Dependency retry round $retry"
-          if make download -j4; then
+          if make download -j$BUILD_J; then
             echo "Dependency download complete"
             break
           fi
@@ -110,8 +118,27 @@ jobs:
 
         # 强制预编译，触发 Go 模块等隐藏依赖下载
         echo "开始强制预编译，触发全部隐藏依赖下载（预计耗时较长）..."
-        make -j4 IGNORE_ERRORS=1 V=s 2>&1 | tee force_compile.log || true
+        make -j$BUILD_J IGNORE_ERRORS=1 V=s 2>&1 | tee force_compile.log || true
         echo "强制预编译结束，已触发所有包的 configure/build 步骤。"
+
+        # --- 新增：专项下载 Go 模块缓存 ---
+        echo "开始专项下载 Go 模块依赖..."
+        export PATH="/workdir/openwrt/staging_dir/host/bin:/workdir/openwrt/staging_dir/hostpkg/bin:$PATH"
+        export GO111MODULE=on
+        # GOPROXY 已在上面根据出口 IP 自动设置，此处不再重复覆盖
+
+        for go_mod_path in $(find build_dir/target-* -name "go.mod" 2>/dev/null); do
+          pkg_dir=$(dirname "$go_mod_path")
+          echo "  正在处理 Go 模块: $pkg_dir"
+          cd "$pkg_dir"
+          go mod download 2>&1 || true
+          cd /workdir/openwrt
+        done
+
+        mkdir -p dl/go-mod-cache
+        cp -ru /root/go/pkg/mod/cache/* dl/go-mod-cache/ 2>/dev/null || true
+        echo "Go 模块依赖处理完成。"
+        # --- 新增结束 ---
 
         # 清理中间产物，只保留 dl 缓存
         rm -rf build_dir/target-x86_64_musl
