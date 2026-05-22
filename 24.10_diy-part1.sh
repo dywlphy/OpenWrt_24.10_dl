@@ -19,5 +19,5 @@ src-git openclash https://github.com/vernesong/OpenClash.git    # Clash 稳定
 src-git mosdns https://github.com/sbwml/luci-app-mosdns.git      # DNS 分流神器
 
 # ✅ 修正为正确的 LuCI 界面源
-src-git luci-app-smartdns https://github.com/pymumu/luci-app-smartdns.git
+src-git luci_app_smartdns https://github.com/pymumu/luci-app-smartdns.git
 EOF
