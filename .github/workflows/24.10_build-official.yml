@@ -1,4 +1,4 @@
-name: Download OpenWrt 24.10 Sources
+name: Download OpenWrt 24.10 DL Cache
 
 on:
   repository_dispatch:
@@ -13,14 +13,14 @@ env:
   TZ: Asia/Shanghai
 
 jobs:
-  download:
+  dl_download:
     runs-on: ubuntu-22.04
 
     steps:
-    - name: Checkout
+    - name: Checkout workspace files
       uses: actions/checkout@main
 
-    - name: Initialization environment
+    - name: Install compile dependencies
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
@@ -31,7 +31,7 @@ jobs:
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
 
-    - name: Clone source code
+    - name: Clone OpenWrt source
       working-directory: /workdir
       run: |
         git clone -b ${{ env.REPO_BRANCH }} --single-branch --depth 1 ${{ env.REPO_URL }} openwrt
@@ -41,42 +41,38 @@ jobs:
       uses: actions/cache@v4
       with:
         path: /workdir/openwrt/dl
-        key: openwrt-dl-full-24.10-${{ hashFiles('24.10_diy-part1.sh','24.10_diy-part2.sh','24.10_config.txt') }}
+        key: openwrt-24.10-local-dl-${{ hashFiles('24.10_diy-part1.sh','24.10_diy-part2.sh','24.10_config.txt') }}
         restore-keys: |
-          openwrt-dl-full-24.10-
+          openwrt-24.10-local-dl-
 
-    - name: Load custom feeds
+    - name: Load custom feeds source
       run: |
         chmod +x 24.10_diy-part1.sh
         cd openwrt
         $GITHUB_WORKSPACE/24.10_diy-part1.sh
 
-    - name: Update feeds
-      run: cd openwrt && ./scripts/feeds update -a
-
-    - name: Install feeds & build full deps tree
+    - name: Update & install feeds
       run: |
         cd openwrt
+        ./scripts/feeds update -a
         ./scripts/feeds install -a
-        make defconfig
-        make prereq
+        ./scripts/feeds uninstall -p passwall_packages geoview 2>/dev/null || true
 
-    - name: Load configuration
+    - name: Import config and second diy script
       run: |
         [ -e 24.10_config.txt ] && cp 24.10_config.txt openwrt/.config
         chmod +x 24.10_diy-part2.sh
         cd openwrt
         $GITHUB_WORKSPACE/24.10_diy-part2.sh
 
-    - name: Configure and full deep dependency download
+    - name: Config tune & full dependency download(j4 fixed)
       run: |
         cd openwrt
+        # 海外优先Go代理，适配GitHub云编译
         export GO111MODULE=on
-        export GOPROXY=https://goproxy.cn,direct
-        export MAKEFLAGS="-j$(nproc)"
+        export GOPROXY=https://proxy.golang.org,https://goproxy.cn,direct
 
         make defconfig
-
         sed -i 's/CONFIG_PACKAGE_geoview=[ym]/# CONFIG_PACKAGE_geoview is not set/' .config
         sed -i 's/CONFIG_PACKAGE_dnsmasq=[ym]/# CONFIG_PACKAGE_dnsmasq is not set/' .config
         sed -i 's/CONFIG_PACKAGE_kmod-fullconenat=[ym]/# CONFIG_PACKAGE_kmod-fullconenat is not set/' .config
@@ -85,41 +81,40 @@ jobs:
         sed -i 's/CONFIG_PACKAGE_kmod-ipt-nat6=[ym]/# CONFIG_PACKAGE_kmod-ipt-nat6 is not set/' .config
         sed -i 's/CONFIG_PACKAGE_v2ray-plugin=[ym]/# CONFIG_PACKAGE_v2ray-plugin is not set/' .config
         sed -i 's/CONFIG_PACKAGE_luci-app-passwall2_INCLUDE_V2ray_Plugin=[ym]/# CONFIG_PACKAGE_luci-app-passwall2_INCLUDE_V2ray_Plugin is not set/' .config
-
         make defconfig
 
-        ./scripts/feeds uninstall -p passwall_packages geoview 2>/dev/null || true
         make prereq
 
-        make download -j$(nproc) V=s
-        make target/download -j$(nproc)
-        make package/download -j$(nproc)
+        make download -j4 V=s
+        make target/download -j4
+        make package/download -j4
 
         for retry in {1..3}; do
-          echo "第${retry}轮补下载校验"
+          echo "Dependency retry round $retry"
           if make download -j4; then
-            echo "本轮依赖校验无缺失"
+            echo "Dependency download complete"
             break
           fi
-          sleep 20
+          sleep 30
         done
 
         find dl -type f -size -1024c -delete
         find dl -name "*.part" -delete
         find dl -name "*.tmp" -delete
 
-        echo "最终dl文件数: $(ls dl | wc -l)"
-        echo "dl目录总大小: $(du -sh dl)"
+        echo "DL file count: $(ls dl | wc -l)"
+        echo "DL total size: $(du -sh dl)"
 
-    - name: Upload dl cache
+    - name: Export full dl cache artifact
       uses: actions/upload-artifact@v4
       with:
-        name: openwrt-dl-cache-24.10
+        name: openwrt-24.10-full-dl-cache
         path: openwrt/dl
-        retention-days: 7
+        retention-days: 14
 
-    - name: Done
+    - name: Download finish tip
       run: |
-        echo "=========================================="
-        echo " ✅ 云端全量依赖下载完成"
-        echo "=========================================="
+        echo "====================================="
+        echo "✅ 云侧全量依赖下载完毕"
+        echo "下载包可直接替换本地 /root/openwrt-dl-cache"
+        echo "====================================="
