@@ -41,9 +41,9 @@ jobs:
       uses: actions/cache@v4
       with:
         path: /workdir/openwrt/dl
-        key: openwrt-dl-24.10-${{ hashFiles('24.10_diy-part1.sh') }}
+        key: openwrt-dl-full-24.10-${{ hashFiles('24.10_diy-part1.sh','24.10_diy-part2.sh','24.10_config.txt') }}
         restore-keys: |
-          openwrt-dl-24.10-
+          openwrt-dl-full-24.10-
 
     - name: Load custom feeds
       run: |
@@ -54,8 +54,12 @@ jobs:
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
 
-    - name: Install feeds
-      run: cd openwrt && ./scripts/feeds install -a
+    - name: Install feeds & build full deps tree
+      run: |
+        cd openwrt
+        ./scripts/feeds install -a
+        make defconfig
+        make prereq
 
     - name: Load configuration
       run: |
@@ -64,20 +68,15 @@ jobs:
         cd openwrt
         $GITHUB_WORKSPACE/24.10_diy-part2.sh
 
-    # ==============================
-    # 👇 下面这段是修复重点
-    # ==============================
-    - name: Configure and download
+    - name: Configure and full deep dependency download
       run: |
         cd openwrt
-        
-        # 修复 1：设置国内 GOPROXY（必须！）
         export GO111MODULE=on
         export GOPROXY=https://goproxy.cn,direct
-        
+        export MAKEFLAGS="-j$(nproc)"
+
         make defconfig
-        
-        # 禁用冲突包
+
         sed -i 's/CONFIG_PACKAGE_geoview=[ym]/# CONFIG_PACKAGE_geoview is not set/' .config
         sed -i 's/CONFIG_PACKAGE_dnsmasq=[ym]/# CONFIG_PACKAGE_dnsmasq is not set/' .config
         sed -i 's/CONFIG_PACKAGE_kmod-fullconenat=[ym]/# CONFIG_PACKAGE_kmod-fullconenat is not set/' .config
@@ -86,32 +85,31 @@ jobs:
         sed -i 's/CONFIG_PACKAGE_kmod-ipt-nat6=[ym]/# CONFIG_PACKAGE_kmod-ipt-nat6 is not set/' .config
         sed -i 's/CONFIG_PACKAGE_v2ray-plugin=[ym]/# CONFIG_PACKAGE_v2ray-plugin is not set/' .config
         sed -i 's/CONFIG_PACKAGE_luci-app-passwall2_INCLUDE_V2ray_Plugin=[ym]/# CONFIG_PACKAGE_luci-app-passwall2_INCLUDE_V2ray_Plugin is not set/' .config
-        
+
         make defconfig
-        
-        # 修复 2：卸载 geoview 必须放在 defconfig 之后
+
         ./scripts/feeds uninstall -p passwall_packages geoview 2>/dev/null || true
-        
-        # 修复 3：下载用 -j4，稳定不炸
-        for i in 1 2 3; do
+        make prereq
+
+        make download -j$(nproc) V=s
+        make target/download -j$(nproc)
+        make package/download -j$(nproc)
+
+        for retry in {1..3}; do
+          echo "第${retry}轮补下载校验"
           if make download -j4; then
-            echo "✅ 下载成功"
+            echo "本轮依赖校验无缺失"
             break
           fi
-          echo "⚠️ 下载失败，重试..."
-          sleep 30
+          sleep 20
         done
-        
-        # 修复 4：永不报错的清理命令
-        find dl -type f -size -1024c -delete
-        
-        echo "文件数量: $(ls dl | wc -l)"
-        echo "总大小: $(du -sh dl | cut -f1)"
 
-    # ==============================
-    # 👇 修复 5：删除错误的预编译命令
-    # 只保留 下载dl，不编译
-    # ==============================
+        find dl -type f -size -1024c -delete
+        find dl -name "*.part" -delete
+        find dl -name "*.tmp" -delete
+
+        echo "最终dl文件数: $(ls dl | wc -l)"
+        echo "dl目录总大小: $(du -sh dl)"
 
     - name: Upload dl cache
       uses: actions/upload-artifact@v4
@@ -123,5 +121,5 @@ jobs:
     - name: Done
       run: |
         echo "=========================================="
-        echo " ✅ 下载完成！"
+        echo " ✅ 云端全量依赖下载完成"
         echo "=========================================="
