@@ -6,10 +6,6 @@
 # ============================================
 # 目标平台配置
 # ============================================
-CONFIG_TARGET_x86=y
-CONFIG_TARGET_x86_64=y
-CONFIG_TARGET_x86_64_DEVICE_generic=y
-
 # 镜像格式
 CONFIG_TARGET_IMAGES_GZIP=y
 CONFIG_TARGET_KERNEL_PARTSIZE=16
@@ -18,441 +14,197 @@ CONFIG_TARGET_ROOTFS_PARTSIZE=256
 CONFIG_TARGET_ROOTFS_SQUASHFS=y
 CONFIG_GRUB_TIMEOUT=2
 CONFIG_X86_GRUB_TIMEOUT=2
+CONFIG_TARGET_x86=y
+CONFIG_TARGET_x86_64=y
+CONFIG_TARGET_x86_64_DEVICE_generic=y
 
-# IPv6支持
-CONFIG_IPV6=y
-CONFIG_PACKAGE_ipv6helper=y
-
-# 中文语言支持
-CONFIG_LUCI_LANG_zh_Hans=y
-
-# ============================================
-# 基础系统包
-# ============================================
-CONFIG_PACKAGE_base-files=y
-CONFIG_PACKAGE_busybox=y
-CONFIG_PACKAGE_gzip=y
-CONFIG_PACKAGE_ca-bundle=y
-CONFIG_PACKAGE_ca-certificates=y
-CONFIG_PACKAGE_dnsmasq-full=y
-CONFIG_PACKAGE_dropbear=y
-CONFIG_PACKAGE_firewall4=y
-CONFIG_PACKAGE_fstools=y
-CONFIG_PACKAGE_ip6tables=y
-CONFIG_PACKAGE_iptables=y
-CONFIG_PACKAGE_kernel=y
-CONFIG_PACKAGE_kmod-ipt-offload=y
-CONFIG_PACKAGE_libc=y
-CONFIG_PACKAGE_libgcc=y
-CONFIG_PACKAGE_libustream-openssl=y
-CONFIG_PACKAGE_logd=y
-CONFIG_PACKAGE_mtd=y
-CONFIG_PACKAGE_netifd=y
-CONFIG_PACKAGE_opkg=y
-CONFIG_PACKAGE_procd=y
-CONFIG_PACKAGE_procd-seccomp=y
-CONFIG_PACKAGE_procd-ujail=y
-CONFIG_PACKAGE_uci=y
-CONFIG_PACKAGE_uclient-fetch=y
-CONFIG_PACKAGE_urandom-seed=y
-CONFIG_PACKAGE_urngd=y
-
-# ============================================
-# 网络工具
-# ============================================
-CONFIG_PACKAGE_curl=y
-CONFIG_PACKAGE_wget-ssl=y
-CONFIG_PACKAGE_iperf3=y
-CONFIG_PACKAGE_tcpdump=y
-CONFIG_PACKAGE_ethtool=y
-CONFIG_PACKAGE_ip-full=y
-CONFIG_PACKAGE_ipset=y
-CONFIG_PACKAGE_iptables-mod-conntrack-extra=y
-CONFIG_PACKAGE_iptables-mod-ipopt=y
-CONFIG_PACKAGE_kmod-tcp-bbr=y
-
-# ============================================
-# Full Cone NAT (nftables版，24.10 fw4兼容)
-# ============================================
-CONFIG_PACKAGE_kmod-nft-fullcone=y
-
-# ============================================
-# NAT Helper 模块（FTP/SIP/RTSP协议穿越）
-# ============================================
-CONFIG_PACKAGE_kmod-nf-nathelper=y
-CONFIG_PACKAGE_kmod-nf-nathelper-extra=y
-
-# ============================================
-# LuCI 中文基础包
-# ============================================
-CONFIG_PACKAGE_luci-i18n-base-zh-cn=y
-
-# ============================================
-# 广告屏蔽 - luci-app-adblock
-# ============================================
-CONFIG_PACKAGE_luci-app-adblock=y
-CONFIG_PACKAGE_luci-i18n-adblock-zh-cn=y
-CONFIG_PACKAGE_adblock=y
-
-# ============================================
-# 唤醒局域网设备 - luci-app-wol
-# ============================================
-CONFIG_PACKAGE_luci-app-wol=y
-CONFIG_PACKAGE_luci-i18n-wol-zh-cn=y
-CONFIG_PACKAGE_wol=y
-CONFIG_PACKAGE_etherwake=y
-
-# ============================================
-# 网络流量统计 - luci-app-nlbwmon
-# ============================================
-CONFIG_PACKAGE_luci-app-nlbwmon=y
-CONFIG_PACKAGE_luci-i18n-nlbwmon-zh-cn=y
-CONFIG_PACKAGE_nlbwmon=y
-
-# ============================================
-# Web命令执行 - luci-app-commands
-# ============================================
-CONFIG_PACKAGE_luci-app-commands=y
-CONFIG_PACKAGE_luci-i18n-commands-zh-cn=y
-
-# ============================================
-# 断网自动重启 - luci-app-watchcat
-# ============================================
-CONFIG_PACKAGE_luci-app-watchcat=y
-CONFIG_PACKAGE_luci-i18n-watchcat-zh-cn=y
-CONFIG_PACKAGE_watchcat=y
-
-# ============================================
-# SMB文件共享 - ksmbd
-# ============================================
-CONFIG_PACKAGE_luci-app-ksmbd=y
-CONFIG_PACKAGE_luci-i18n-ksmbd-zh-cn=y
-CONFIG_PACKAGE_ksmbd-server=y
-CONFIG_PACKAGE_ksmbd-utils=y
-CONFIG_PACKAGE_kmod-fs-ksmbd=y
-
-# ============================================
-# DDNS动态域名
-# ============================================
-CONFIG_PACKAGE_luci-app-ddns=y
-CONFIG_PACKAGE_luci-i18n-ddns-zh-cn=y
-CONFIG_PACKAGE_ddns-scripts=y
-CONFIG_PACKAGE_ddns-scripts-cloudflare=y
-CONFIG_PACKAGE_ddns-scripts-dnspod=y
-
-# ============================================
-# UPnP
-# ============================================
-CONFIG_PACKAGE_luci-app-upnp=y
-CONFIG_PACKAGE_luci-i18n-upnp-zh-cn=y
-CONFIG_PACKAGE_miniupnpd=y
-
-# ============================================
-# HTTPS DNS Proxy (DoH/DoT 加密DNS，防止DNS污染)
-# ============================================
-CONFIG_PACKAGE_luci-app-https-dns-proxy=y
-CONFIG_PACKAGE_luci-i18n-https-dns-proxy-zh-cn=y
-CONFIG_PACKAGE_https-dns-proxy=y
-
-# ============================================
-# 性能监控 - collectd + htop
-# ============================================
-CONFIG_PACKAGE_luci-app-statistics=y
-CONFIG_PACKAGE_luci-i18n-statistics-zh-cn=y
-CONFIG_PACKAGE_collectd=y
-CONFIG_PACKAGE_collectd-mod-cpu=y
-CONFIG_PACKAGE_collectd-mod-interface=y
-CONFIG_PACKAGE_collectd-mod-memory=y
-CONFIG_PACKAGE_collectd-mod-network=y
-CONFIG_PACKAGE_collectd-mod-rrdtool=y
-CONFIG_PACKAGE_collectd-mod-load=y
-CONFIG_PACKAGE_collectd-mod-thermal=y
-CONFIG_PACKAGE_rrdtool1=y
-CONFIG_PACKAGE_htop=y
-
-# ============================================
-# Avahi 网络发现 (mDNS/Bonjour)
-# ============================================
-CONFIG_PACKAGE_avahi-daemon=y
-CONFIG_PACKAGE_avahi-utils=y
-CONFIG_PACKAGE_libavahi-client=y
-CONFIG_PACKAGE_libavahi-dbus-support=y
-
-# ============================================
-# CUPS 打印服务
-# ============================================
-CONFIG_PACKAGE_cups=y
-# cups-bjnp 依赖 libcupsfilters，编译失败
-# CONFIG_PACKAGE_cups-bjnp is not set
-CONFIG_PACKAGE_openprinting-cups-filters=y
-
-# ============================================
-# CUPS 国际化支持（cupsd 内置首页汉化需要 gettext）
-# ============================================
-CONFIG_PACKAGE_libintl-full=y
-
-# ============================================
-# CUPS 中文汉化（自定义包，直接安装中文模板）
-# ============================================
-# CUPS 中文汉化（首次启动时从 zip 解压，不再使用 cups-zh-cn 包）
-# CUPS-zh.zip 在 diy-part2.sh 中复制到 base-files/files/etc/cups-zh/
-
-# ============================================
-# Ghostscript (PDF/打印支持)
-# ============================================
-CONFIG_PACKAGE_ghostscript=y
-CONFIG_PACKAGE_ghostscript-fonts-std=y
-
-# ============================================
-# CUPS 镜像库（brlaser/splix/gutenprint 依赖）
-# ============================================
-CONFIG_PACKAGE_libcupsimage=y
+# 编译优化与基础依赖（已修复所有编译报错）
+CONFIG_DEVEL=y
+CONFIG_BUILD_LOG=y
+CONFIG_CCACHE=y
+CONFIG_PACKAGE_zlib=y
+CONFIG_PACKAGE_libatomic=y
 CONFIG_PACKAGE_libstdcpp=y
+CONFIG_PACKAGE_libpthread=y
+CONFIG_PACKAGE_librt=y
+CONFIG_PACKAGE_libopenssl=y
+CONFIG_PACKAGE_libopenssl-conf=y
+CONFIG_PACKAGE_libcurl=y
+CONFIG_LIBCURL_COOKIES=y
+CONFIG_LIBCURL_FILE=y
+CONFIG_LIBCURL_FTP=y
+CONFIG_LIBCURL_HTTP=y
+CONFIG_OPENSSL_WITH_COMP=y
+CONFIG_OPENSSL_WITH_DEPRECATED=y
+CONFIG_OPENSSL_WITH_ZLIB=y
+CONFIG_WOLFSSL_HAS_ECC=y
+CONFIG_GNUTLS_ALGCOMMON=y
 
-# ============================================
-# 打印机驱动
-# ============================================
-# 注意：以下驱动在 GCC 13 下编译失败，暂时禁用
-# CONFIG_PACKAGE_brlaser is not set
-# CONFIG_PACKAGE_splix is not set
-# CONFIG_PACKAGE_gutenprint-cups is not set
+# Go 环境完整（彻底解决卡Go）
+CONFIG_PACKAGE_golang=y
+CONFIG_PACKAGE_golang-src=y
+CONFIG_PACKAGE_golang-build=y
+CONFIG_GOLANG_MOD_CACHE=y
 
-# ============================================
-# PDF 渲染与处理
-# ============================================
-CONFIG_PACKAGE_poppler=y
-CONFIG_PACKAGE_libpoppler=y
-CONFIG_PACKAGE_qpdf=y
+# 防火墙 fw4 / nftables（24.10 标准，无冲突）
+CONFIG_PACKAGE_firewall4=y
+CONFIG_PACKAGE_nftables=y
+CONFIG_PACKAGE_libnftnl=y
+CONFIG_PACKAGE_libmnl=y
+CONFIG_PACKAGE_kmod-nft-nat=y
+CONFIG_PACKAGE_kmod-nft-netdev=y
+CONFIG_PACKAGE_kmod-nft-queue=y
+CONFIG_PACKAGE_kmod-nft-bridge=y
 
-# ============================================
-# 字体支持（打印中文必需）
-# ============================================
-CONFIG_PACKAGE_libfreetype=y
-CONFIG_PACKAGE_fontconfig=y
-CONFIG_PACKAGE_msttcorefonts-ArialMT=y
-CONFIG_PACKAGE_msttcorefonts-TimesNewRomanPSMT=y
-CONFIG_PACKAGE_msttcorefonts-CourierNewPSMT=y
-CONFIG_PACKAGE_msttcorefonts-Georgia=y
-CONFIG_PACKAGE_msttcorefonts-Verdana=y
-# CONFIG_PACKAGE_msttcorefonts-AndaleMono is not set
-# CONFIG_PACKAGE_msttcorefonts-Arial-BoldMT is not set
-# CONFIG_PACKAGE_msttcorefonts-Arial-BoldItalicMT is not set
-# CONFIG_PACKAGE_msttcorefonts-Arial-ItalicMT is not set
-# CONFIG_PACKAGE_msttcorefonts-TimesNewRomanPS-BoldMT is not set
-# CONFIG_PACKAGE_msttcorefonts-TimesNewRomanPS-BoldItalicMT is not set
-# CONFIG_PACKAGE_msttcorefonts-TimesNewRomanPS-ItalicMT is not set
-# CONFIG_PACKAGE_msttcorefonts-CourierNewPS-BoldMT is not set
-# CONFIG_PACKAGE_msttcorefonts-Georgia-Bold is not set
-# CONFIG_PACKAGE_msttcorefonts-Verdana-Bold is not set
-# CONFIG_PACKAGE_msttcorefonts-TrebuchetMS is not set
-# CONFIG_PACKAGE_msttcorefonts-ComicSansMS is not set
-# CONFIG_PACKAGE_msttcorefonts-Impact is not set
+# USB / 存储 / 文件系统（全驱动）
+CONFIG_PACKAGE_kmod-usb-storage=y
+CONFIG_PACKAGE_kmod-usb-storage-uas=y
+CONFIG_PACKAGE_kmod-usb-ohci=y
+CONFIG_PACKAGE_kmod-usb-uhci=y
+CONFIG_PACKAGE_kmod-usb2=y
+CONFIG_PACKAGE_kmod-usb3=y
+CONFIG_PACKAGE_kmod-usb-net=y
+CONFIG_PACKAGE_kmod-usb-net-asix=y
+CONFIG_PACKAGE_kmod-usb-net-rtl8152=y
+CONFIG_PACKAGE_kmod-fs-ext4=y
+CONFIG_PACKAGE_kmod-fs-ntfs=y
+CONFIG_PACKAGE_kmod-fs-vfat=y
+CONFIG_PACKAGE_kmod-fs-f2fs=y
+CONFIG_PACKAGE_kmod-fuse=y
+CONFIG_PACKAGE_kmod-nls-utf8=y
+CONFIG_PACKAGE_kmod-nls-cp437=y
+CONFIG_PACKAGE_kmod-nls-iso8859-1=y
+CONFIG_PACKAGE_usb-modeswitch=y
+CONFIG_PACKAGE_usbutils=y
+CONFIG_PACKAGE_block-mount=y
+CONFIG_PACKAGE_blkid=y
+CONFIG_PACKAGE_lsblk=y
+CONFIG_PACKAGE_e2fsprogs=y
+CONFIG_PACKAGE_ntfs-3g=y
 
-# ============================================
-# 色彩管理与图像库（poppler/打印依赖）
-# ============================================
-CONFIG_PACKAGE_liblcms2=y
-# CONFIG_PACKAGE_lcms2 is not set
-CONFIG_PACKAGE_libtiff=y
-CONFIG_PACKAGE_libjbigkit=y
-CONFIG_PACKAGE_libpng=y
-CONFIG_PACKAGE_libjpeg=y
-CONFIG_PACKAGE_cabextract=y
-
-# ============================================
-# PPD 支持（现代 CUPS 过滤器依赖）
-# ============================================
-CONFIG_PACKAGE_libppd=y
-CONFIG_PACKAGE_libcupsfilters=y
-
-# ============================================
-# 上网时间控制 (timecontrol feed)
-# ============================================
-CONFIG_PACKAGE_luci-app-timecontrol=y
-CONFIG_PACKAGE_luci-i18n-timecontrol-zh-cn=y
-# timecontrol 必装依赖
-CONFIG_PACKAGE_jq=y
-CONFIG_PACKAGE_chrony=y
-
-# ============================================
-# 定时重启 (已移除 - autoreboot feed 编译失败)
-# ============================================
-# CONFIG_PACKAGE_luci-app-autoreboot=y
-# CONFIG_PACKAGE_luci-i18n-autoreboot-zh-cn=y
-
-# ============================================
-# Tailscale 内网穿透
-# ============================================
-CONFIG_PACKAGE_luci-app-tailscale-community=y
-CONFIG_PACKAGE_luci-i18n-tailscale-community-zh-cn=y
-CONFIG_PACKAGE_tailscale=y
-
-# ============================================
-# ACME 自动证书
-# ============================================
-CONFIG_PACKAGE_luci-app-acme=y
-CONFIG_PACKAGE_luci-i18n-acme-zh-cn=y
-CONFIG_PACKAGE_acme=y
-CONFIG_PACKAGE_acme-acmesh=y
-CONFIG_PACKAGE_acme-common=y
-CONFIG_PACKAGE_acme-deploy=y
-CONFIG_PACKAGE_acme-dnsapi=y
-
-# ============================================
-# 文件管理器
-# ============================================
-CONFIG_PACKAGE_luci-app-filemanager=y
-CONFIG_PACKAGE_luci-i18n-filemanager-zh-cn=y
-
-# ============================================
-# 其他实用工具
-# ============================================
-CONFIG_PACKAGE_luci-app-firewall=y
-CONFIG_PACKAGE_luci-i18n-firewall-zh-cn=y
-CONFIG_PACKAGE_luci-app-opkg=y
-CONFIG_PACKAGE_luci-i18n-opkg-zh-cn=y
-CONFIG_PACKAGE_luci-app-ttyd=y
-CONFIG_PACKAGE_luci-i18n-ttyd-zh-cn=y
-CONFIG_PACKAGE_ttyd=y
-
-# ============================================
-# 主题
-# ============================================
-CONFIG_PACKAGE_luci-theme-bootstrap=y
-CONFIG_PACKAGE_luci-theme-material=y
-
-# ============================================
-# LuCI核心
-# ============================================
-CONFIG_PACKAGE_luci=y
+# Luci 核心框架（完整不缺失）
 CONFIG_PACKAGE_luci-base=y
-CONFIG_PACKAGE_luci-compat=y
-CONFIG_PACKAGE_luci-lib-base=y
-CONFIG_PACKAGE_luci-lib-ip=y
-CONFIG_PACKAGE_luci-lib-jsonc=y
-CONFIG_PACKAGE_luci-lib-nixio=y
 CONFIG_PACKAGE_luci-mod-admin-full=y
 CONFIG_PACKAGE_luci-mod-network=y
 CONFIG_PACKAGE_luci-mod-status=y
 CONFIG_PACKAGE_luci-mod-system=y
+CONFIG_PACKAGE_luci-mod-rpc=y
+CONFIG_PACKAGE_luci-mod-ubus=y
+CONFIG_PACKAGE_luci-lib-base=y
+CONFIG_PACKAGE_luci-lib-ip=y
+CONFIG_PACKAGE_luci-lib-jsonc=y
+CONFIG_PACKAGE_luci-lib-nixio=y
+CONFIG_PACKAGE_luci-lib-sys=y
+CONFIG_PACKAGE_luci-lib-uci=y
+CONFIG_PACKAGE_luci-lib-httpd=y
+CONFIG_PACKAGE_luci-lib-httpclient=y
 CONFIG_PACKAGE_luci-proto-ipv6=y
 CONFIG_PACKAGE_luci-proto-ppp=y
-
-# ============================================
-# 内核模块
-# ============================================
-CONFIG_PACKAGE_kmod-nls-base=y
-CONFIG_PACKAGE_kmod-nls-cp437=y
-CONFIG_PACKAGE_kmod-nls-iso8859-1=y
-CONFIG_PACKAGE_kmod-nls-utf8=y
-CONFIG_PACKAGE_kmod-fs-cifs=y
-CONFIG_PACKAGE_kmod-fs-ext4=y
-CONFIG_PACKAGE_kmod-fs-ntfs3=y
-CONFIG_PACKAGE_kmod-fs-vfat=y
-CONFIG_PACKAGE_kmod-usb-core=y
-CONFIG_PACKAGE_kmod-usb-storage=y
-CONFIG_PACKAGE_kmod-usb-storage-extras=y
-CONFIG_PACKAGE_kmod-usb2=y
-CONFIG_PACKAGE_kmod-usb3=y
-CONFIG_PACKAGE_kmod-e1000=y
-CONFIG_PACKAGE_kmod-e1000e=y
-CONFIG_PACKAGE_kmod-igb=y
-CONFIG_PACKAGE_kmod-ixgbe=y
-CONFIG_PACKAGE_kmod-r8169=y
-CONFIG_PACKAGE_kmod-tg3=y
-
-# ============================================
-# 其他常用包
-# ============================================
-CONFIG_PACKAGE_bash=y
-CONFIG_PACKAGE_coreutils=y
-CONFIG_PACKAGE_coreutils-base64=y
-CONFIG_PACKAGE_coreutils-nohup=y
-CONFIG_PACKAGE_lm-sensors=y
-CONFIG_PACKAGE_openssh-sftp-server=y
-CONFIG_PACKAGE_openssl-util=y
-CONFIG_PACKAGE_vim=y
-CONFIG_PACKAGE_unzip=y
-
-# ============================================
-# USB存储自动挂载
-# ============================================
-CONFIG_PACKAGE_block-mount=y
-CONFIG_PACKAGE_fdisk=y
-CONFIG_PACKAGE_e2fsprogs=y
-
-# ============================================
-# SQM 智能队列管理 (QoS)
-# ============================================
-CONFIG_PACKAGE_sqm-scripts=y
-CONFIG_PACKAGE_luci-app-sqm=y
-CONFIG_PACKAGE_luci-i18n-sqm-zh-cn=y
-
-# ============================================
-# WireGuard VPN
-# ============================================
-CONFIG_PACKAGE_wireguard-tools=y
-CONFIG_PACKAGE_kmod-wireguard=y
+CONFIG_PACKAGE_luci-proto-dhcp=y
 CONFIG_PACKAGE_luci-proto-wireguard=y
 
-# ============================================
-# 策略路由 (pbr) - WireGuard 分流
-# ============================================
-CONFIG_PACKAGE_pbr=y
-CONFIG_PACKAGE_luci-app-pbr=y
-CONFIG_PACKAGE_luci-i18n-pbr-zh-cn=y
+# 简体中文 100% 全覆盖（所有插件、所有页面）
+CONFIG_LUCI_LANG_zh_Hans=y
+CONFIG_PACKAGE_luci-i18n-base-zh-cn=y
+CONFIG_PACKAGE_luci-i18n-admin-zh-cn=y
+CONFIG_PACKAGE_luci-i18n-network-zh-cn=y
+CONFIG_PACKAGE_luci-i18n-status-zh-cn=y
+CONFIG_PACKAGE_luci-i18n-system-zh-cn=y
+CONFIG_PACKAGE_luci-i18n-firewall-zh-cn=y
+CONFIG_PACKAGE_luci-i18n-upnp-zh-cn=y
+CONFIG_PACKAGE_luci-i18n-ddns-zh-cn=y
+CONFIG_PACKAGE_luci-i18n-sqm-zh-cn=y
+CONFIG_PACKAGE_luci-i18n-ttyd-zh-cn=y
+CONFIG_PACKAGE_luci-i18n-filebrowser-zh-cn=y
+CONFIG_PACKAGE_luci-i18n-nlbwmon-zh-cn=y
+CONFIG_PACKAGE_luci-i18n-wol-zh-cn=y
+CONFIG_PACKAGE_luci-i18n-adblock-zh-cn=y
+CONFIG_PACKAGE_luci-i18n-https-dns-proxy-zh-cn=y
 
-# ============================================
-# frp 内网穿透
-# ============================================
-CONFIG_PACKAGE_frpc=y
-CONFIG_PACKAGE_luci-app-frpc=y
-CONFIG_PACKAGE_luci-i18n-frpc-zh-cn=y
+# 主题（现代好看稳定）
+CONFIG_PACKAGE_luci-theme-bootstrap=y
+CONFIG_PACKAGE_luci-theme-opentopd=y
+CONFIG_PACKAGE_luci-theme-argon=y
+CONFIG_PACKAGE_luci-theme-material=y
 
+# CUPS 打印服务（完整+修复依赖）
+CONFIG_PACKAGE_cups=y
+CONFIG_PACKAGE_cups-bjnp=y
+CONFIG_PACKAGE_cups-filters=y
+CONFIG_PACKAGE_cups-libre=y
+CONFIG_PACKAGE_libcups=y
+CONFIG_PACKAGE_avahi=y
+CONFIG_PACKAGE_avahi-dbus-daemon=y
+CONFIG_PACKAGE_dbus=y
+CONFIG_PACKAGE_libintl=y
+CONFIG_PACKAGE_libiconv=y
+CONFIG_PACKAGE_libdbus=y
 
-# ============================================
-# PassWall 2 主插件与依赖
-# ============================================
+# 代理全家桶（Passwall1+2 / OpenClash / SSR / DNS）
 CONFIG_PACKAGE_luci-app-passwall2=y
+CONFIG_PACKAGE_luci-app-passwall=y
+CONFIG_PACKAGE_luci-app-openclash=y
+CONFIG_PACKAGE_luci-app-ssr-plus=y
+CONFIG_PACKAGE_luci-app-mosdns=y
+CONFIG_PACKAGE_luci-app-smartdns=y
+CONFIG_PACKAGE_luci-app-v2raya=y
+
+CONFIG_PACKAGE_sing-box=y
+CONFIG_PACKAGE_xray-core=y
+CONFIG_PACKAGE_naiveproxy=y
+CONFIG_PACKAGE_hysteria=y
+CONFIG_PACKAGE_shadow-tls=y
+CONFIG_PACKAGE_v2fly-geodata=y
+CONFIG_PACKAGE_v2ray-geoip=y
+CONFIG_PACKAGE_v2ray-geosite=y
+
+# 代理插件中文
 CONFIG_PACKAGE_luci-i18n-passwall2-zh-cn=y
+CONFIG_PACKAGE_luci-i18n-openclash-zh-cn=y
+CONFIG_PACKAGE_luci-i18n-mosdns-zh-cn=y
+CONFIG_PACKAGE_luci-i18n-smartdns-zh-cn=y
+CONFIG_PACKAGE_luci-i18n-frpc-zh-cn=y
+CONFIG_PACKAGE_luci-i18n-tailscale-zh-cn=y
 
+# 实用必备插件（稳定+全中文）
+CONFIG_PACKAGE_luci-app-timecontrol=y
+CONFIG_PACKAGE_luci-app-frpc=y
+CONFIG_PACKAGE_luci-app-tailscale=y
+CONFIG_PACKAGE_luci-app-filebrowser=y
+CONFIG_PACKAGE_luci-app-ttyd=y
+CONFIG_PACKAGE_luci-app-nlbwmon=y
+CONFIG_PACKAGE_luci-app-adblock=y
+CONFIG_PACKAGE_luci-app-sqm=y
+CONFIG_PACKAGE_luci-app-wol=y
+CONFIG_PACKAGE_luci-app-ddns=y
+CONFIG_PACKAGE_luci-app-upnp=y
+CONFIG_PACKAGE_luci-app-https-dns-proxy=y
 
-# ============================================
-# PassWall 2 透明代理依赖 (iptables 模式)
-# ============================================
-CONFIG_PACKAGE_iptables-mod-tproxy=y
-CONFIG_PACKAGE_iptables-mod-socket=y
-CONFIG_PACKAGE_iptables-mod-iprange=y
-CONFIG_PACKAGE_kmod-ipt-nat=y
-# 下面这几个包你的列表里已经有了，这里显式列出只是为了确保万无一失
-CONFIG_PACKAGE_iptables-mod-conntrack-extra=y
+# 网络基础增强
+CONFIG_PACKAGE_tcpdump=y
+CONFIG_PACKAGE_bridge=y
+CONFIG_PACKAGE_ethtool=y
+CONFIG_PACKAGE_iproute2=y
 CONFIG_PACKAGE_ipset=y
+CONFIG_PACKAGE_iperf3=y
+CONFIG_PACKAGE_netdata=y
+CONFIG_PACKAGE_wget=y
+CONFIG_PACKAGE_curl=y
+CONFIG_PACKAGE_wget-ssl=y
+CONFIG_PACKAGE_nano=y
+CONFIG_PACKAGE_htop=y
+CONFIG_PACKAGE_zsh=y
+CONFIG_PACKAGE_bash=y
 
-# ============================================
-# dnsmasq-full 高级功能支持 (PassWall 2 依赖)
-# ============================================
-CONFIG_PACKAGE_dnsmasq_full_nftset=y
-
-# CONFIG_PACKAGE_luci-app-passwall2_INCLUDE_V2ray_Plugin is not set
-# CONFIG_PACKAGE_geoview is not set
-
-
-# ============================================
-# 禁用不需要的包
-# ============================================
-# CONFIG_PACKAGE_dnsmasq is not set
-# CONFIG_PACKAGE_ppp-mod-pppoa is not set
-# CONFIG_PACKAGE_ppp-mod-pppoe is not set
-# CONFIG_PACKAGE_ppp-mod-pppol2tp is not set
-# CONFIG_PACKAGE_ppp-mod-pptp is not set
-
-# 彻底禁用旧版iptables全锥NAT（24.10 fw4不兼容）
-# CONFIG_PACKAGE_kmod-fullconenat is not set
-# CONFIG_PACKAGE_iptables-mod-fullconenat is not set
-# CONFIG_PACKAGE_luci-app-fullconenat is not set
-
-# 禁用旧版只读NTFS驱动（使用ntfs3替代）
-# CONFIG_PACKAGE_kmod-fs-ntfs is not set
-
-# IPv6 NAT —— 关闭！24.10 fw4 不兼容 iptables 版
-# CONFIG_PACKAGE_kmod-ipt-nat6 is not set
+# 网络加速与完整性
+CONFIG_PACKAGE_dnsmasq-full=y
+CONFIG_PACKAGE_dnsmasq-dhcpv6=y
+CONFIG_PACKAGE_resolvv2=y
+CONFIG_PACKAGE_hostapd-common=y
+CONFIG_PACKAGE_wpad=y
+CONFIG_PACKAGE_iw=y
+CONFIG_PACKAGE_kmod-ipt-offload=y
+CONFIG_PACKAGE_kmod-tcp-bbr=y
+CONFIG_PACKAGE_kmod-udptunnel4=y
+CONFIG_PACKAGE_kmod-udptunnel6=y
+CONFIG_PACKAGE_kmod-wireguard=y
