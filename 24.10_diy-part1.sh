@@ -1,17 +1,3 @@
-#!/bin/bash
-#
-# diy-part1.sh - 配置feeds源（在Update feeds之前执行）
-# OpenWrt 24.10 版本
-#
-
-echo "=========================================="
-echo "OpenWrt 24.10 Official Stable Build"
-echo "diy-part1.sh - 配置feeds源"
-echo "=========================================="
-
-# 配置feeds源
-echo "[1/3] 配置feeds源..."
-
 cat > feeds.conf << 'EOF'
 # 官方基础（必稳）
 src-git packages https://github.com/openwrt/packages.git;openwrt-24.10
@@ -31,25 +17,7 @@ src-git passwall2 https://github.com/dywlphy/openwrt-passwall2.git;main
 src-git helloworld https://github.com/fw876/helloworld.git        # SSR/SS 全套
 src-git openclash https://github.com/vernesong/OpenClash.git    # Clash 稳定
 src-git mosdns https://github.com/sbwml/luci-app-mosdns.git      # DNS 分流神器
-src-git smartdns https://github.com/pymumu/openwrt-smartdns.git # DNS 加速
-src-git lucipasswall https://github.com/xiaorouji/openwrt-passwall.git # Passwall 1
 
-# ================================
-# 实用功能（全部官方/稳定源 → 100%兼容）
-# ================================
-src-git filemanager https://github.com/ysc3839/luci-app-filemanager.git # 文件管理
-src-git ttyd https://github.com/tsl0922/ttyd.git               # 网页终端
+# ✅ 修正为正确的 LuCI 界面源
+src-git luci-app-smartdns https://github.com/pymumu/luci-app-smartdns.git
 EOF
-
-echo "[2/3] 当前feeds配置:"
-cat feeds.conf
-
-echo ""
-echo "[3/3] OpenWrt版本信息:"
-echo "Branch: openwrt-24.10"
-echo "Target: Official Stable"
-
-echo ""
-echo "=========================================="
-echo "diy-part1.sh 执行完成"
-echo "=========================================="
