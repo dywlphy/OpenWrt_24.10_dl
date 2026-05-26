@@ -145,7 +145,7 @@ jobs:
         rm -rf staging_dir/target-x86_64_musl
         rm -rf build_dir/toolchain-x86_64_gcc-*
 
-        find dl -type f -size -1024c -delete
+        #find dl -type f -size -1024c -delete
         find dl -name "*.part" -delete
         find dl -name "*.tmp" -delete
 
